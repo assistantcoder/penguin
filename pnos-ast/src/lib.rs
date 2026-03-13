@@ -35,6 +35,7 @@ pub enum CalculateAst {
 pub enum AllowAsign {
     Variable(String),
     Value(Types),
+    None,
 }
 
 #[derive(Debug, PartialEq, Clone)]

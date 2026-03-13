@@ -27,8 +27,9 @@ impl MakeNewFunction for pnos_ast::Function {
                 sig.params.push(AbiParam::new(parametr.as_irtype()));
             }
         }
-        let rt = return_type;
-        sig.returns.push(AbiParam::new(rt.unwrap().as_irtype()));
+        if let Some(rt) = return_type {
+            sig.returns.push(AbiParam::new(rt.as_irtype()));
+        }
         let func_id = module
             .declare_function(name.as_str(), Linkage::Export, &sig)
             .unwrap();
