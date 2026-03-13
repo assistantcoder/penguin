@@ -22,7 +22,6 @@ Block: Block = {
     <SyntaxDefiner*> => Block::Declare(<>)
 }
 SyntaxDefiner: SyntaxDefiner = {
-    //"return" <Val> ";" => <>
     <Var> => SyntaxDefiner::Variable(<>),
     <Return> => SyntaxDefiner::ReturnKeyword(<>)
 }
@@ -32,13 +31,8 @@ AllowAsign: AllowAsign = {
     <Val> => AllowAsign::Value(<>),
 }
 Var: Variable = {
-    <t:Types> <n:IDEN> "=" <v:Val> ";" => {
-        if t != v.kind(){
-            panic!("mismatch type assigned");
-        };
-        let output = Variable::New{name:n.to_string(),valuet:v};
-        output
-    },
+    <t:Types> <n:IDEN> "=" <a:AllowAsign> ";" => Variable::Declare(n.to_string(),a),
+    <n:IDEN> "=" <a:AllowAsign> ";" => Variable::FromOld(n.to_string(),a)
 }
 
 Types: TypesKind = {

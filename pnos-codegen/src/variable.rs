@@ -41,10 +41,16 @@ impl VariablesLeader {
 }
 pub fn variable_matcher(data: &pnos_ast::Variable, builder: &mut BuilderWrapper) {
     match data {
-        pnos_ast::Variable::New { name, valuet } => {
+        pnos_ast::Variable::Declare(name, pnos_ast::AllowAsign::Value(valuet)) => {
             builder
                 .var
                 .new(name.to_string(), valuet.clone(), &mut builder.builder)
+        }
+        pnos_ast::Variable::FromOld(old, pnos_ast::AllowAsign::Variable(new)) => {
+            let Some(var) = builder.var.get(old.to_string()) else {
+                todo!()
+            };
+            builder.builder.use_var(var);
         }
         _ => todo!(),
     }
