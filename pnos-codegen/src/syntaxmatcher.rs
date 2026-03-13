@@ -20,8 +20,8 @@ pub fn match_next(builder: &mut BuilderWrapper, block: &pnos_ast::Block) {
             //define variable
             pnos_ast::SyntaxDefiner::Variable(v) => variable::variable_matcher(v, builder),
             pnos_ast::SyntaxDefiner::ReturnKeyword(pnos_ast::AllowAsign::Variable(v)) => {
-                if let Some(var) = builder.var.get(v.to_string()) {
-                    let re = builder.builder.use_var(var.to_owned());
+                if let Some(var) = builder.var.get(v) {
+                    let re = builder.builder.use_var(var.1);
                     builder.builder.ins().return_(&[re]);
                 }
             }

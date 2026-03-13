@@ -44,7 +44,7 @@ pub enum Types {
     String(String),
     Bool(bool),
 }
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum TypesKind {
     Int,
     Float,
