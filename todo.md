@@ -10,3 +10,5 @@ block0:
     v0 = iconst.i64 10
     return v0  ; v0 = 10
 }
+
+## Nwxt step is define calct ast, link it with allow assign but do not and more matcher just small function integreted, start from syntax matcher because will use it in many places
