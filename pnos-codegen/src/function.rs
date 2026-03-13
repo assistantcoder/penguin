@@ -12,7 +12,7 @@ pub trait MakeNewFunction {
 }
 pub struct BuilderWrapper<'a> {
     pub builder: FunctionBuilder<'a>,
-    pub var: &'a mut variable::VariablesLeader<'a>,
+    pub var: variable::VariablesLeader,
 }
 
 impl MakeNewFunction for pnos_ast::Function {
@@ -48,7 +48,6 @@ impl MakeNewFunction for pnos_ast::Function {
         let mut func = Function::with_name_signature(UserFuncName::user(0, func_id.as_u32()), sig);
         let mut fb_ctx = FunctionBuilderContext::new();
         let kind_builder = FunctionBuilder::new(&mut func, &mut fb_ctx);
-        let map: HashMap<String, Variable>;
         let mut builder = BuilderWrapper {
             builder: kind_builder,
             var: variable::VariablesLeader::init(),
