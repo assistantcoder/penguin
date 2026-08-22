@@ -1,0 +1,85 @@
+use crate::ast::*;
+use std::collections::HashMap;
+grammar;
+match{
+    "fun",
+    "float","int","bool","string",
+    "true","false",
+    "(",")",
+    ",",":",
+    "{","}",
+    "+","-","*","/","=",";",
+    r#"-?[0-9]+\.[0-9]+"# => FLOAT_LIT,
+    r"-?[0-9]+" => INT_LIT,
+    r#""[^\"]*""# => STRING_LIT,
+    r"[a-zA-Z_][a-zA-Z0-9$_]*" => IDEN
+}
+pub Void: Void = {
+    <Function> => Void::Function(<>),
+}
+Block: Block = {
+    <Var> => Block::Variable(<>),
+}
+//=========variable module===============
+
+Var: Variable = {
+    <t:Types> <n:IDEN> "=" <v:Val> ";" => {
+        if t != v.kind(){
+            panic!("mismatch type assigned");
+        };
+        let output = Variable::Variant{name:n.to_string(),valuet:v};
+        output
+    },
+}
+
+Types: TypesKind = {
+    "int" => TypesKind::Int,
+    "float" => TypesKind::Float,
+    "string" => TypesKind::String,
+    "bool" => TypesKind::Bool,
+}
+Val: Types = {
+     "true" => Types::Bool(true),
+     "false" => Types::Bool(false),
+     <v:INT_LIT> => Types::Int(v.parse::<i64>().unwrap()),
+     <v:FLOAT_LIT> => Types::Float(v.parse::<f64>().unwrap()),
+     <v:STRING_LIT> => Types::String(v.to_string()),
+}
+
+//========calculator module==============
+
+Calc: CalculateAst = {
+    <l:Calc> "+" <r:Factor> => CalculateAst::ExprBinary{left: Box::new(l), op: Oprators::Add, right: Box::new(r)},
+    <l:Calc> "-" <r:Factor> => CalculateAst::ExprBinary{left: Box::new(l), op: Oprators::Sub, right: Box::new(r)},
+    Factor,
+}
+Factor: CalculateAst = {
+    <l:Factor> "*" <r:Term> => CalculateAst::ExprBinary{left: Box::new(l), op: Oprators::Mul, right: Box::new(r)},
+    <l:Factor> "/" <r:Term> => CalculateAst::ExprBinary{left: Box::new(l), op: Oprators::Div, right: Box::new(r)},
+    Term,
+}
+Term: CalculateAst = {
+    <n:INT_LIT> => CalculateAst::Number(n.parse().unwrap()),
+    "(" <e:Calc> ")" => e,
+}
+//========function module==============
+Function: Function = {
+    "fun" <n:IDEN> "(" <p:Comma<Parametrs>> ")" "{" <b:Block> "}" => {
+    Function::Declare{
+    name:n.to_string(),
+    parametrs: Some(HashMap::from_iter(p)),
+    block: b
+    }}
+}
+Parametrs: (String,TypesKind) = {
+    <i:IDEN> ":" <t:Types> => (i.to_string(),t)
+}
+Comma<T>: Vec<T> = {
+    <mut v:(<T> ",")*> <e:T?> => match e {
+        None => v,
+        Some(e) => {
+            v.push(e);
+            v
+        }
+    }
+};
