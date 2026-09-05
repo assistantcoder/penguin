@@ -1,4 +1,4 @@
-use crate::ast::*;
+use pnos_ast::*;
 use std::collections::HashMap;
 grammar;
 match{
@@ -18,7 +18,10 @@ pub Void: Void = {
     <Function> => Void::Function(<>),
 }
 Block: Block = {
-    <Var> => Block::Variable(<>),
+    <SyntaxDefiner+> => Block::Declare(<>)
+}
+SyntaxDefiner: SyntaxDefiner = {
+    <Var> => SyntaxDefiner::Variable(<>)
 }
 //=========variable module===============
 

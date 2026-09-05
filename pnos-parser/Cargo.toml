@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 lalrpop-util = { version = "0.22.1", features = ["lexer"] }
+pnos-ast = {path = "../pnos-ast"}
 
 [build-dependencies]
 lalrpop = "0.22.1"

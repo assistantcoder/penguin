@@ -1,4 +1,5 @@
 use clap::{ Parser, Subcommand };
+mod collector;
 #[derive(Parser,Debug)]
 struct Cli{
     #[command(subcommand)]
@@ -24,11 +25,15 @@ fn main() {
     let cli = Cli::parse();
     println!("{cli:?}");
     match cli.commands {
-        Commands::Run { path: _ } => pnos_parser::parse(r#"fun main(name: string){
-            string name = "isaac";
-            }"#),
+        Commands::Run { path } => {
+            match collector::read_path(path) {
+                Ok(v) => {
+                    pnos_codegen::codegen(pnos_parser::parse(v));
+                    
+                },
+                Err(err) => println!("{err}")
+            }
+        },
         _ => todo!()
     }
-
-    
 }

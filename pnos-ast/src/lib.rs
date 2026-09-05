@@ -1,11 +1,15 @@
 use std::collections::HashMap;
 #[derive(Debug)]
 pub enum Block{
-    Variable(Variable)
+    Declare(Vec<SyntaxDefiner>)
 }
 #[derive(Debug)]
 pub enum Void {
     Function(Function)
+}
+#[derive(Debug)]
+pub enum SyntaxDefiner {
+    Variable(Variable),
 }
 //This section for calculate and operations
 #[derive(Debug,PartialEq)]
