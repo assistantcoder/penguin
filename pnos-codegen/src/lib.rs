@@ -1,35 +1,24 @@
-use cranelift_codegen::ir::{AbiParam, Function, InstBuilder, Signature, types,UserFuncName};
-use cranelift_codegen::isa::{CallConv};
-use cranelift_codegen::{settings, Context};
-use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext};
-use cranelift_module::{default_libcall_names, Module, ModuleError, Linkage};
-use cranelift_object::{ObjectBuilder, ObjectModule};
-use target_lexicon::Triple;
-use std::fs;
 use pnos_ast;
-struct AotCompiler {
-    module: ObjectModule,
-}
-impl AotCompiler {
-    fn new() -> Result<Self, ModuleError> {
-        let isa_builder = cranelift_codegen::isa::lookup(Triple::host()).unwrap();
-        let isa = isa_builder.finish(settings::Flags::new(settings::builder()))?;
-        let obj_builder = ObjectBuilder::new(isa, "prog", default_libcall_names())?;
-        let module = ObjectModule::new(obj_builder);
-        Ok(Self { module })
-    }
-    fn write(self, path: &str) -> Result<(), Box<dyn std::error::Error>> {
-        let product = self.module.finish();
-        let bytes = product.emit()?;
-        fs::write(path, bytes)?;
-        Ok(())
-    }
-}
-fn exec() -> AotCompiler{
-    
-    
+mod function;
+mod helper;
+use function::MakeNewFunction;
+use helper::{AotCompiler};
+use cranelift_codegen::Context;
+use cranelift_module::Module;
+fn exec(ast: pnos_ast::Void) -> AotCompiler{
     let mut compiler = AotCompiler::new().unwrap();
     let module = &mut compiler.module;
+    match ast {
+        pnos_ast::Void::Function(pnos_ast::Function::Declare { name, parametrs, return_type, block }) => {
+            let func = pnos_ast::Function::Declare { name, parametrs, return_type, block }.new(module);
+            let mut ctx = Context::for_function(func.1.clone());
+            println!("----------ir--------------");
+            println!("{:?}",func.1);
+            module.define_function(func.0, &mut ctx).unwrap();
+            module.clear_context(&mut ctx);
+        }
+    }
+/*
     let mut sig = Signature::new(CallConv::SystemV);
     sig.params.push(AbiParam::new(types::I32));   // أول parameter
     sig.params.push(AbiParam::new(types::I32));   // ثاني parameter
@@ -47,15 +36,17 @@ fn exec() -> AotCompiler{
 
     let sum = builder.ins().iadd(v0, v1);
     builder.ins().return_(&[sum]);
+    
     builder.finalize();
     let mut ctx = Context::for_function(func);
     module.define_function(func_id, &mut ctx).unwrap();
     module.clear_context(&mut ctx);
+    */
     compiler
 }
 pub fn codegen(ast: pnos_ast::Void) {
-    let compiler = exec();
+    println!("{:?}",&ast);
+    let compiler = exec(ast);
     compiler.write("main.o").unwrap();
     println!("✓ main.o created");
-    println!("{ast:?}")
 }

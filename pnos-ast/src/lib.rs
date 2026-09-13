@@ -10,6 +10,7 @@ pub enum Void {
 #[derive(Debug)]
 pub enum SyntaxDefiner {
     Variable(Variable),
+    ReturnKeyword(AllowAsign)
 }
 //This section for calculate and operations
 #[derive(Debug,PartialEq)]
@@ -29,8 +30,13 @@ pub enum CalculateAst {
     }
 }
 //This section for variable, types and assignment
+#[derive(Debug)]
+pub enum AllowAsign {
+    Variable(String),
+    Value(Types)
+}
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug,PartialEq,Clone)]
 pub enum Types{
     Int(i64),
     Float(f64),
@@ -61,5 +67,5 @@ impl Types {
 //========functions sction==============
 #[derive(Debug)]
 pub enum Function{
-    Declare{name: String,parametrs: Option<HashMap<String,TypesKind>>,block: Block}
+    Declare{name: String,parametrs: Option<HashMap<String,TypesKind>>,return_type: Option<TypesKind>,block: Block}
 }

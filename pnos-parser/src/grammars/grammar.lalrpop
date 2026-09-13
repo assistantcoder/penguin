@@ -5,6 +5,7 @@ match{
     "fun",
     "float","int","bool","string",
     "true","false",
+    "return",
     "(",")",
     ",",":",
     "{","}",
@@ -18,13 +19,18 @@ pub Void: Void = {
     <Function> => Void::Function(<>),
 }
 Block: Block = {
-    <SyntaxDefiner+> => Block::Declare(<>)
+    <SyntaxDefiner*> => Block::Declare(<>)
 }
 SyntaxDefiner: SyntaxDefiner = {
-    <Var> => SyntaxDefiner::Variable(<>)
+    //"return" <Val> ";" => <>
+    <Var> => SyntaxDefiner::Variable(<>),
+    <Return> => SyntaxDefiner::ReturnKeyword(<>)
 }
 //=========variable module===============
-
+AllowAsign: AllowAsign = {
+    <IDEN> => AllowAsign::Variable(<>.to_string()),
+    <Val> => AllowAsign::Value(<>),
+}
 Var: Variable = {
     <t:Types> <n:IDEN> "=" <v:Val> ";" => {
         if t != v.kind(){
@@ -67,12 +73,16 @@ Term: CalculateAst = {
 }
 //========function module==============
 Function: Function = {
-    "fun" <n:IDEN> "(" <p:Comma<Parametrs>> ")" "{" <b:Block> "}" => {
+    "fun" <n:IDEN> "(" <p:Comma<Parametrs>> ")" <r:Types?> "{" <b:Block> "}" => {
     Function::Declare{
     name:n.to_string(),
     parametrs: Some(HashMap::from_iter(p)),
-    block: b
+    block: b,
+    return_type: r
     }}
+}
+Return: AllowAsign = {
+    "return" <AllowAsign> ";" => <>,
 }
 Parametrs: (String,TypesKind) = {
     <i:IDEN> ":" <t:Types> => (i.to_string(),t)
