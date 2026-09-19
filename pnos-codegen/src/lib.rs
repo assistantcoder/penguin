@@ -1,7 +1,9 @@
 use pnos_ast;
 mod function;
 mod helper;
-use function::MakeNewFunction;
+mod block;
+use function::{MakeNewFunction,BuilderWrapper};
+use block::make_block;
 use helper::{AotCompiler};
 use cranelift_codegen::Context;
 use cranelift_module::Module;
