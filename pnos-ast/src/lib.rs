@@ -52,7 +52,12 @@ pub enum TypesKind{
 }
 #[derive(Debug,PartialEq)]
 pub enum Variable {
-    Variant{name: String, valuet: Types}
+    New{
+        name: String,
+        valuet: Types
+    },
+    Assign(String),
+    CalculateAst(CalculateAst)
 }
 impl Types {
     pub fn kind(&self) -> TypesKind {

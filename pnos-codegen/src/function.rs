@@ -38,7 +38,7 @@ impl MakeNewFunction for pnos_ast::Function {
         let func_id = module.declare_function(name.as_str(), Linkage::Export, &sig).unwrap();
         let mut func = Function::with_name_signature(UserFuncName::user(0, func_id.as_u32()), sig);
         let mut fb_ctx = FunctionBuilderContext::new();
-        let mut kind_builder = FunctionBuilder::new(&mut func, &mut fb_ctx);
+        let kind_builder = FunctionBuilder::new(&mut func, &mut fb_ctx);
         let mut builder = BuilderWrapper { builder: kind_builder };
         crate::make_block(&mut builder,block);
         if *return_type == None {

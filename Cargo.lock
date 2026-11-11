@@ -583,7 +583,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "penguinos"
+name = "penguin"
 version = "0.1.0"
 dependencies = [
  "clap",

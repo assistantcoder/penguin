@@ -36,7 +36,7 @@ Var: Variable = {
         if t != v.kind(){
             panic!("mismatch type assigned");
         };
-        let output = Variable::Variant{name:n.to_string(),valuet:v};
+        let output = Variable::New{name:n.to_string(),valuet:v};
         output
     },
 }
