@@ -3,7 +3,7 @@ use std::collections::HashMap;
 grammar;
 match{
     "fun",
-    "float","int","bool","string",
+    "float","int","bool","string","void",
     "true","false",
     "return",
     "(",")",
@@ -72,8 +72,12 @@ Term: CalculateAst = {
     "(" <e:Calc> ")" => e,
 }
 //========function module==============
+FuncReturnKeyWord: Option<TypesKind> = {
+    <Types> => Some(<>),
+    "void" => None
+}
 Function: Function = {
-    "fun" <n:IDEN> "(" <p:Comma<Parametrs>> ")" <r:Types?> "{" <b:Block> "}" => {
+    <r:FuncReturnKeyWord> <n:IDEN> "(" <p:Comma<Parametrs>> ")" "{" <b:Block> "}" => {
     Function::Declare{
     name:n.to_string(),
     parametrs: Some(HashMap::from_iter(p)),

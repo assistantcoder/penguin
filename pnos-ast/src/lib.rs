@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+
 #[derive(Debug)]
 pub enum Block{
     Declare(Vec<SyntaxDefiner>)

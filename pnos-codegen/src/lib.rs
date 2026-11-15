@@ -1,26 +1,39 @@
 use pnos_ast;
+mod block;
 mod function;
 mod helper;
-mod block;
-use function::{MakeNewFunction,BuilderWrapper};
+mod syntaxmatcher;
+mod variable;
 use block::make_block;
-use helper::{AotCompiler};
 use cranelift_codegen::Context;
 use cranelift_module::Module;
-fn exec(ast: pnos_ast::Void) -> AotCompiler{
+use function::{BuilderWrapper, MakeNewFunction};
+use helper::AotCompiler;
+fn exec(ast: pnos_ast::Void) -> AotCompiler {
     let mut compiler = AotCompiler::new().unwrap();
     let module = &mut compiler.module;
     match ast {
-        pnos_ast::Void::Function(pnos_ast::Function::Declare { name, parametrs, return_type, block }) => {
-            let func = pnos_ast::Function::Declare { name, parametrs, return_type, block }.new(module);
+        pnos_ast::Void::Function(pnos_ast::Function::Declare {
+            name,
+            parametrs,
+            return_type,
+            block,
+        }) => {
+            let func = pnos_ast::Function::Declare {
+                name,
+                parametrs,
+                return_type,
+                block,
+            }
+            .new(module);
             let mut ctx = Context::for_function(func.1.clone());
             println!("----------ir--------------");
-            println!("{:?}",func.1);
+            println!("{:?}", func.1);
             module.define_function(func.0, &mut ctx).unwrap();
             module.clear_context(&mut ctx);
         }
     }
-/*
+    /*
     let mut sig = Signature::new(CallConv::SystemV);
     sig.params.push(AbiParam::new(types::I32));   // أول parameter
     sig.params.push(AbiParam::new(types::I32));   // ثاني parameter
@@ -38,7 +51,7 @@ fn exec(ast: pnos_ast::Void) -> AotCompiler{
 
     let sum = builder.ins().iadd(v0, v1);
     builder.ins().return_(&[sum]);
-    
+
     builder.finalize();
     let mut ctx = Context::for_function(func);
     module.define_function(func_id, &mut ctx).unwrap();
@@ -47,7 +60,7 @@ fn exec(ast: pnos_ast::Void) -> AotCompiler{
     compiler
 }
 pub fn codegen(ast: pnos_ast::Void) {
-    println!("{:?}",&ast);
+    println!("{:?}", &ast);
     let compiler = exec(ast);
     compiler.write("main.o").unwrap();
     println!("✓ main.o created");
