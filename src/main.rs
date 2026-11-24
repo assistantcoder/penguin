@@ -19,7 +19,7 @@ fn main() {
     let cli = Cli::parse();
     println!("{cli:?}");
     match cli.commands {
-        Commands::Run { path } => match collector::read_path(path) {
+        Commands::Build { path } => match collector::read_path(path) {
             Ok(v) => {
                 pnos_codegen::codegen(pnos_parser::parse(v));
             }

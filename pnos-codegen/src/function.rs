@@ -1,6 +1,5 @@
-
-use crate::variable;
-use cranelift_codegen::ir::{AbiParam, Function, InstBuilder, Signature, UserFuncName, types};
+use crate::variable::{self, TypesKind};
+use cranelift_codegen::ir::{AbiParam, Function, Signature, UserFuncName};
 use cranelift_codegen::isa::CallConv;
 use cranelift_frontend::{FunctionBuilder, FunctionBuilderContext};
 use cranelift_module::{FuncId, Linkage, Module};
@@ -25,22 +24,11 @@ impl MakeNewFunction for pnos_ast::Function {
         let mut sig = Signature::new(CallConv::SystemV);
         if let Some(parametrs) = parametrs {
             for parametr in parametrs.values() {
-                match parametr {
-                    pnos_ast::TypesKind::Int => sig.params.push(AbiParam::new(types::I64)),
-                    pnos_ast::TypesKind::Float => sig.params.push(AbiParam::new(types::F64)),
-                    _ => todo!(),
-                };
+                sig.params.push(AbiParam::new(parametr.as_irtype()));
             }
         }
-        if let Some(v) = return_type {
-            match v {
-                pnos_ast::TypesKind::Int => sig.returns.push(AbiParam::new(types::I64)),
-                pnos_ast::TypesKind::Float => sig.returns.push(AbiParam::new(types::F64)),
-                _ => todo!(),
-            }
-        } else {
-            sig.returns.push(AbiParam::new(types::I64))
-        }
+        let rt = return_type;
+        sig.returns.push(AbiParam::new(rt.unwrap().as_irtype()));
         let func_id = module
             .declare_function(name.as_str(), Linkage::Export, &sig)
             .unwrap();
@@ -52,10 +40,6 @@ impl MakeNewFunction for pnos_ast::Function {
             var: variable::VariablesLeader::init(),
         };
         crate::make_block(&mut builder, block);
-        if *return_type == None {
-            let exit_code = builder.builder.ins().iconst(types::I64, 0);
-            builder.builder.ins().return_(&[exit_code]);
-        }
         /////////
         builder.builder.finalize();
         (func_id, func)

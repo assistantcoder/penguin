@@ -41,14 +41,12 @@ pub enum AllowAsign {
 pub enum Types {
     Int(i64),
     Float(f64),
-    String(String),
     Bool(bool),
 }
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]
 pub enum TypesKind {
     Int,
     Float,
-    String,
     Bool,
 }
 #[derive(Debug, PartialEq)]
@@ -61,11 +59,11 @@ impl Types {
         match self {
             Types::Int(_) => TypesKind::Int,
             Types::Float(_) => TypesKind::Float,
-            Types::String(_) => TypesKind::String,
             Types::Bool(_) => TypesKind::Bool,
         }
     }
 }
+
 //========functions sction==============
 #[derive(Debug)]
 pub enum Function {

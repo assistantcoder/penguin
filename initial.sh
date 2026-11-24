@@ -1,5 +1,5 @@
 #bin/bash
-cargo run -- run $PWD/src/main.ps
+cargo run -- build $PWD/src/main.ps
 cc $PWD/main.o -o program
 ./program
 echo $?

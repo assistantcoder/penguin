@@ -6,18 +6,18 @@ use cranelift_codegen::{
 use cranelift_frontend::{FunctionBuilder, Variable};
 use std::collections::HashMap;
 
-trait AstTypes {
+pub trait AstTypes {
     fn extract_value(&self, builder: &mut FunctionBuilder) -> Value;
 }
-trait TypesKind {
+pub trait TypesKind {
     fn as_irtype(&self) -> types::Type;
 }
 impl AstTypes for pnos_ast::Types {
     fn extract_value(&self, builder: &mut FunctionBuilder) -> Value {
         match self {
-            Self::Int(v) => builder.ins().iconst(types::I64, *v),
+            Self::Int(v) => builder.ins().iconst(self.kind().as_irtype(), *v),
             Self::Float(v) => builder.ins().f64const(*v),
-            _ => todo!(),
+            Self::Bool(v) => builder.ins().iconst(self.kind().as_irtype(), *v as i64),
         }
     }
 }
@@ -26,7 +26,7 @@ impl TypesKind for pnos_ast::TypesKind {
         match self {
             Self::Int => types::I64,
             Self::Float => types::F64,
-            _ => todo!(),
+            Self::Bool => types::I8,
         }
     }
 }
